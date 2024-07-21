@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1>TO DOリスト</h1>
+  <input type="text" id="input" placeholder="タスクを入力">
+  <button id="add" onclick="addTask()">追加</button>
+  <ul id="todoList"></ul>
+  <script>
+    function addTask() {
+
+      const input = document.getElementById("input");
+      const todoList = document.getElementById("todoList");
+      const li = document.createElement("li");
+      const checkbox = document.createElement("input");
+
+      if(input.value === "") {
+        alert("タスクを入力してください");
+        return;
+      }
+      
+      checkbox.type = "checkbox";
+      const taskText = document.createTextNode(input.value);
+      li.appendChild(checkbox);
+      li.appendChild(taskText);
+      todoList.appendChild(li);
+      input.value = "";
+    }
+  </script>
+</body>
+</html>
