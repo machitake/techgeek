@@ -22,11 +22,16 @@
         alert("タスクを入力してください");
         return;
       }
-      
+      // checkboxにid属性を付与
+      checkbox.id = "todo-" + Date.now(); // 適当な一意のIDを生成
       checkbox.type = "checkbox";
-      const taskText = document.createTextNode(input.value);
+      const taskLabel = document.createElement("label");
+      taskLabel.htmlFor = checkbox.id;
+      taskLabel.innerText = input.value;
+     // const taskText = document.createTextNode(input.value);
       li.appendChild(checkbox);
-      li.appendChild(taskText);
+      // li.appendChild(taskText);
+      li.appendChild(taskLabel);
       todoList.appendChild(li);
       input.value = "";
     }
