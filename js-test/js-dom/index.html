@@ -11,40 +11,160 @@
   <button id="add" onclick="addTask()">追加</button>
   <ul id="todoList"></ul>
   <script>
+    // 追加ボタンを押したときの処理
     function addTask() {
 
       const input = document.getElementById("input");
       const todoList = document.getElementById("todoList");
-      const li = document.createElement("li");
-      const checkbox = document.createElement("input");
 
       if(input.value === "") {
         alert("タスクを入力してください");
         return;
       }
-      // checkboxにid属性を付与
-      checkbox.id = "todo-" + Date.now(); // 適当な一意のIDを生成
-      checkbox.type = "checkbox";
-      const taskLabel = document.createElement("label");
-      taskLabel.htmlFor = checkbox.id;
-      taskLabel.innerText = input.value;
-     // const taskText = document.createTextNode(input.value);
-      li.appendChild(checkbox);
-      // li.appendChild(taskText);
-      li.appendChild(taskLabel);
-      todoList.appendChild(li);
-      input.value = "";
 
+      // 新しいTodoオブジェクトの作成
+      const newTodo = {
+        id: "todo-" + Date.now(),
+        task: input.value,
+        completed: false
+      };
+
+      const todoElement = createTodoElement(newTodo);
+      todoList.appendChild(todoElement);
+
+      // LocalStorageに保存
+      addTodo(newTodo);
+
+      // 入力フィールドをクリア
+      input.value = "";
+    }
+
+    // リストにTodoを追加
+    function addTodo(newTodo) {
+      // 既存のTodoリストを取得なければ空の配列を使用
+      let todos = JSON.parse(localStorage.getItem('todos')) || [];
+      // 新しいTodoを配列の末尾に追加
+      todos.push(newTodo);
+      // 更新されたリストを保存
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
+
+    // リストの表示
+    function displayTodos() {
+      
+      const todoList = document.getElementById("todoList");
+      const todos = JSON.parse(localStorage.getItem('todos')) || [];
+      
+      // 既存のリストをクリア
+      todoList.innerHTML = '';
+
+      todos.forEach(todo => {
+        const todoElement = createTodoElement(todo);
+        todoList.appendChild(todoElement);
+      });
 
     }
+
+    // リストの要素を作成
+    function createTodoElement(todo) {
+      const li = document.createElement("li");
+      const checkbox = document.createElement("input");
+      const taskLabel = document.createElement("label");
+      const deleteButton = document.createElement("button");
+      const editButton = document.createElement("button");
+
+      li.dataset.id = todo.id;
+
+      checkbox.id = todo.id;
+      checkbox.type = "checkbox";
+      checkbox.checked = todo.completed;
+
+      deleteButton.innerText = "削除";
+      deleteButton.addEventListener('click', function() {
+        deleteTodo(checkbox.id);
+      });
+
+      taskLabel.htmlFor = checkbox.id;
+      taskLabel.innerText = todo.task;
+
+      editButton.innerText = "編集";
+      editButton.addEventListener('click', function() {
+        editTodo(checkbox.id);
+      });
+
+      li.appendChild(checkbox);
+      li.appendChild(taskLabel);
+      li.appendChild(deleteButton);
+      li.appendChild(editButton);
+
+      checkbox.addEventListener('change', function() {
+        updateTodoStatus(todo.id, this.checked);
+      });
+      return li;
+    }
+
+    // チェックボックスの状態変更
+    function updateTodoStatus(id, completed) {
+      const todos = JSON.parse(localStorage.getItem('todos')) || [];
+      const todo = todos.find(todo => todo.id === id);
+      if(todo) {
+        todo.completed = completed;
+        localStorage.setItem('todos', JSON.stringify(todos));
+      }
+    }
+
+    // 削除ボタンを押したときの処理
+    function deleteTodo(id) {
+      const todos = JSON.parse(localStorage.getItem('todos')) || [];
+      // 指定されたid以外のTodoをフィルタリングして新しい配列を作成
+      const newTodos = todos.filter(todo => todo.id !== id);
+      // 更新されたリストを保存
+      localStorage.setItem('todos', JSON.stringify(newTodos));
+      // リストを再描画
+      displayTodos();
+    }
     
-    //一度に大量のデータ（数MB）をlocalStorageとsessionStorageに保存しようとしてみてください。
-    // fetch('./amazon_products.csv')
-    // .then(response => response.text())
-    // .then(data => {
-    //   localStorage.setItem('largeData', data);
-    //   sessionStorage.setItem('largeData', data);
-    // });
+    // 編集ボタンを押したときの処理
+    function editTodo(id) {
+      const input = document.getElementById("input");
+      const todoList = document.getElementById("todoList");
+      const todos = JSON.parse(localStorage.getItem('todos')) || [];
+      const todo = todos.find(todo => todo.id === id);
+      if (!todo) return;  // Todoが見つからない場合は処理を終了
+
+      // 編集用の新しい入力フィールドを作成
+      const editInput = document.createElement("input");
+      editInput.type = "text";
+      editInput.value = todo.task;
+
+      // 保存ボタンを作成
+      const saveButton = document.createElement("button");
+      saveButton.textContent = "保存";
+      saveButton.onclick = () => saveTodoEdit(id, editInput.value);
+
+      // 編集用の入力フィールドと保存ボタンを表示
+      const todoItem = document.querySelector(`li[data-id="${id}"]`);
+      if (todoItem) {
+        todoItem.innerHTML = ''; // 既存の内容をクリア
+        todoItem.appendChild(editInput);
+        todoItem.appendChild(saveButton);
+        editInput.focus(); // 入力フィールドにフォーカスを当てる
+      }
+    }
+
+    // 編集した内容を保存
+    function saveTodoEdit(id, newText) {
+      const todos = JSON.parse(localStorage.getItem('todos')) || [];
+      const todoIndex = todos.findIndex(todo => todo.id === id);
+      if (todoIndex !== -1) {
+        todos[todoIndex].task = newText; // テキストを更新
+        localStorage.setItem('todos', JSON.stringify(todos)); // ローカルストレージを更新
+        displayTodos(); // Todoリストを再描画
+      }
+    }
+    
+    // ページ読み込み時にTodoを表示
+    window.onload = displayTodos;
   </script>
 </body>
 </html>
