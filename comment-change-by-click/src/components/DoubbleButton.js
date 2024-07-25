@@ -1,11 +1,7 @@
 import './DoubbleButton.css';
+import changeText from '../lib/changeText';
 
 export default function DoubbleButton() {
-  function changeText(comment) {
-    const changeText = document.getElementById('changeText');
-    changeText.innerText = `${comment} Clicked!`;
-  }
-  
   return (
     <>
       <div className="dinamic-comment">

@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "name": "心",
+    "evaluation": 5
+  },
+  {
+    "id": 2,
+    "name": "吾輩は猫である",
+    "evaluation": 3
+  },
+  {
+    "id": 3,
+    "name": "坊ちゃん",
+    "evaluation": 2
+  }
+]
