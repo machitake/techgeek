@@ -3,9 +3,10 @@ import './App.css';
 import DoubbleButton from './components/DoubbleButton';
 import ReactStars from './components/ReactStars';
 import data from './data.json';
+import CountUp from './components/CountUp';
+import TextInput from './components/TextInput';
 
 function App() {
-  console.log(data);
   return (
     <div className='App'>
       {/* <DoubbleButton /> */}
@@ -18,6 +19,12 @@ function App() {
           </div>
         ))}
       </div>
+    
+      <h1>カウントアップ10でリセットされる</h1>
+      <CountUp />
+
+      <h1>テキスト入力フィールド</h1>
+      <TextInput />
     </div>
   );
 }
