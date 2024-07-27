@@ -1,46 +1,21 @@
 import './App.css';
-import { useState, useEffect } from 'react';
+import { createContext, useState } from 'react';
+import UserList from './components/UserList';
+export const languageContext = createContext();
 
 function App() {
-  const [users, setUsers] = useState([]);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [loading, setLoading] = useState(true);
-
-  function getUsers() {
-    fetch(`https://reqres.in/api/users?per_page=3&page=${pageNumber}`)
-    .then(res => res.json())
-    .then(data => setUsers(data))
-  }
-
-  useEffect(() => {
-    setLoading(true);
-    getUsers();
-  }, [pageNumber])
-
+  const [language, setLanguage] = useState("ja_JP");
   return (
-    <div className="App">
-      <div className='container'>
-        <div className='header'>
-          <h2>React.jsでデータを取り扱う方法</h2>
-        </div>
-        <div className='content'>
-          <ul>
-            {users.data ? users.data.map((user) => (
-              <li key={user.id} className='user-card'>
-                <img src={user.avatar} alt={user.first_name} />
-                <p>{user.first_name} {user.last_name}</p>
-                <p>{user.email}</p>
-              </li>
-            )): <p>データを取得中です</p>
-            }
-          </ul>
-        </div>
-        <div className='pagination'>
-          {pageNumber > 1 && <button onClick={() => setPageNumber(pageNumber - 1)}>前へ</button>}
-          {pageNumber < users.total_pages && <button onClick={() => setPageNumber(pageNumber + 1)}>次へ</button>}
-        </div>
+    <languageContext.Provider value={language}>
+      <div className="App">
+        {/* コンテキストを切り替えるセレクトボックス */}
+        <select onChange={(e) => setLanguage(e.target.value)}>
+          <option value="ja_JP" selected={language === "ja_JP" ? true : false}>日本語</option>
+          <option value="en_US" selected={language === "en_US" ? true : false}>英語</option>
+        </select>
+        <UserList />
       </div>
-    </div>
+    </languageContext.Provider>
   );
 }
 
