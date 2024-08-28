@@ -1,5 +1,6 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
+import Pagination from './components/Pagination';
 
 function MovieSearch() {
   //検索キーワード
@@ -11,6 +12,11 @@ function MovieSearch() {
   //総ページ数
   const [totalPages, setTotalPages] = useState(0);
 
+  //ページ変更用の関数
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
 
   //映画を検索する関数
   const searchMovies = (page) => {
@@ -19,7 +25,9 @@ function MovieSearch() {
       .then(res => res.json())
       .then(data => {
         setMovies(data.results);
+        // console.log(data.results);
         setTotalPages(data.total_pages);
+        // console.log(data.total_pages);
       })
       .catch(error => console.error('Error:', error));
   };
@@ -32,29 +40,13 @@ function MovieSearch() {
   //入力のたびにsetQueryを更新
   const handleInputChange = (event) => {
     setQuery(event.target.value);
-  };
-  
-  //検索ボタンをクリックしたときにsearchMoviesを実行
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setCurrentPage(1); // 検索ボタンをクリックした場合もページを1にリセット
+    setCurrentPage(1);
     searchMovies(1);
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
   };
 
   return (
     <div className='movie-search-container'>
+      <h1>映画検索</h1>
       <div className="search-bar">
         <input 
           type="text" 
@@ -62,24 +54,28 @@ function MovieSearch() {
           onChange={handleInputChange} 
           placeholder="映画を検索"
         />
-        <button type="submit" onClick={handleSubmit}>検索</button>
       </div>
+
       <ul className="movie-list">
         {movies.map(movie => (
-          <li className="movie-item" key={movie.id}>
-            {movie.title}
+          <li className="movie-item" key={movie.id} onClick={() => console.log(movie)}>
+            {/* ポスター画像 */}
+            <img src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`} alt={movie.title} />
+            {/* タイトル */}
+            <h3>{movie.title}</h3>
+            {/* 概要 */}
+            <p>{movie.overview}</p>
             {/* リリース日 */}
             <p>{movie.release_date}</p>
-            {/* 映画のバックドロップ画像 */}
-            <img src={`https://image.tmdb.org/t/p/w200/${movie.backdrop_path}`} alt={movie.title} />
           </li>
         ))}
       </ul>
-      <div>
-        <button onClick={handlePrevPage} disabled={currentPage === 1}>前へ</button>
-        <span>ページ {currentPage} / {totalPages}</span>
-        <button onClick={handleNextPage} disabled={currentPage === totalPages}>次へ</button>
-      </div>
+
+      <Pagination 
+        currentPage={currentPage} 
+        totalPages={totalPages} 
+        onPageChange={handlePageChange} 
+      />
     </div>
   );
 }
